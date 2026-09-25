@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Carris Metropolitana | Lisboa ⇄ Montijo Rápido</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#FDB71A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CM Rápido">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+
+  <!-- Local Leaflet assets -->
+  <link rel="stylesheet" href="/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cm-yellow: #FDB71A;
+      --cm-yellow-hover: #e5a415;
+      --cm-dark: #12151B;
+      --cm-card: #1C2029;
+      --cm-card-subtle: #242935;
+      --cm-border: #2C3242;
+      --cm-text: #F3F4F6;
+      --cm-text-muted: #9CA3AF;
+      --cm-green: #10B981;
+      --cm-blue: #3B82F6;
+      --cm-red: #EF4444;
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--cm-dark);
+      color: var(--cm-text);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: rgba(18, 21, 27, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--cm-border);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: var(--cm-yellow);
+      color: #000;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--cm-green);
+      background: rgba(16, 185, 129, 0.12);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--cm-green);
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Location Status Bar */
+    .status-panel {
+      background: var(--cm-card);
+      border: 1px solid var(--cm-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .route-context {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .direction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cm-card-subtle);
+      border: 1px solid var(--cm-border);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .direction-pill .arrow {
+      color: var(--cm-yellow);
+      font-weight: 800;
+    }
+
+    .quick-switch {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      background: var(--cm-card-subtle);
+      border: 1px solid var(--cm-border);
+      color: var(--cm-text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm:hover {
+      border-color: var(--cm-yellow);
+      color: var(--cm-text);
+    }
+
+    .btn-refresh {
+      background: var(--cm-yellow);
+      color: #000;
+      border: none;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-refresh:active {
+      transform: scale(0.97);
+    }
+
+    /* Hero Recommendation Card */
+    .hero-card {
+      background: linear-gradient(145deg, #222834 0%, #171b22 100%);
+      border: 2px solid var(--cm-yellow);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(253, 183, 26, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: 'OPÇÃO MAIS RÁPIDA';
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: var(--cm-yellow);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .line-badge {
+      background: var(--cm-yellow);
+      color: #000;
+      font-size: 26px;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 12px;
+      letter-spacing: -0.5px;
+      box-shadow: 0 4px 12px rgba(253, 183, 26, 0.3);
+    }
+
+    .hero-dest {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      color: var(--cm-text-muted);
+      margin-top: 2px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--cm-text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    .stat-val.highlight {
+      color: var(--cm-yellow);
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--cm-text-muted);
+      margin-top: 2px;
+    }
+
+    .walking-info {
+      background: var(--cm-card-subtle);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .walking-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .walking-icon {
+      font-size: 20px;
+    }
+
+    .btn-maps {
+      background: transparent;
+      color: var(--cm-yellow);
+      border: 1px solid var(--cm-yellow);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-maps:hover {
+      background: var(--cm-yellow);
+      color: #000;
+    }
+
+    /* Map Card */
+    .map-card {
+      background: var(--cm-card);
+      border: 1px solid var(--cm-border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .map-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--cm-border);
+    }
+
+    .map-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #map {
+      height: 320px;
+      width: 100%;
+      background: #151820;
+    }
+
+    /* Nearest Stops List */
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stops-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .stop-card {
+      background: var(--cm-card);
+      border: 1px solid var(--cm-border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .stop-card:hover {
+      border-color: #3f475c;
+    }
+
+    .stop-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .stop-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stop-dist {
+      font-size: 12px;
+      color: var(--cm-text-muted);
+      white-space: nowrap;
+    }
+
+    .departures-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .departures-table th {
+      text-align: left;
+      color: var(--cm-text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .departures-table td {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .departures-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .line-tag {
+      background: var(--cm-yellow);
+      color: #000;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      display: inline-block;
+    }
+
+    .time-tag {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .min-tag {
+      font-weight: 700;
+      color: var(--cm-green);
+    }
+
+    /* Skeleton Loading State */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--cm-card-subtle);
+      border-top-color: var(--cm-yellow);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--cm-text-muted);
+      padding: 20px;
+      border-top: 1px solid var(--cm-border);
+      background: var(--cm-dark);
+    }
+
+    footer a {
+      color: var(--cm-yellow);
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .hero-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .brand-title {
+        font-size: 14px;
+      }
+      .status-panel {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-badge">CM</div>
+      <div class="brand-title">Lisboa ⇄ Montijo Directo</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <button id="btnInstallApp" onclick="installPWA()" style="display: none; background: var(--cm-yellow); color: #000; border: none; font-weight: 800; font-size: 12px; padding: 6px 12px; border-radius: 8px; cursor: pointer; align-items: center; gap: 6px;">
+        📲 Instalar App
+      </button>
+      <div class="live-indicator">
+        <div class="pulse-dot"></div>
+        <span id="liveStatusText">API Carris Metropolitana</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Status & Location Switcher -->
+    <div class="status-panel">
+      <div>
+        <div style="font-size: 12px; color: var(--cm-text-muted); margin-bottom: 4px;">Localização Detetada:</div>
+        <div class="route-context">
+          <div class="direction-pill" id="routeDirectionPill">
+            <span id="currentLocName">A localizar...</span>
+            <span class="arrow">➜</span>
+            <span id="destLocName">Aguardando GPS</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <button class="btn-sm" onclick="forceSimulate('lisbon')">Simular Lisboa (Oriente)</button>
+        <button class="btn-sm" onclick="forceSimulate('montijo')">Simular Montijo</button>
+        <button class="btn-refresh" onclick="getUserLocation()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          Atualizar GPS
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="contentArea">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p style="font-size: 15px; font-weight: 600;">Obtendo sua localização e horários em tempo real...</p>
+        <p style="font-size: 13px; color: var(--cm-text-muted); margin-top: 6px;">Por favor, permita o acesso à localização no navegador.</p>
+      </div>
+    </div>
+
+    <!-- Interactive Map -->
+    <div class="map-card">
+      <div class="map-header">
+        <div class="map-title">
+          <span>📍</span> Mapa da Paragem & Trajeto
+        </div>
+        <div style="font-size: 12px; color: var(--cm-text-muted);" id="mapStatus">
+          A carregar mapa...
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <!-- Alternatives list -->
+    <div id="alternativesSection" style="display: none;">
+      <h3 class="section-title">
+        <span>🕒</span> Outras Paragens e Horários Próximos
+      </h3>
+      <div class="stops-list" id="stopsList"></div>
+    </div>
+  </main>
+
+  <footer>
+    Dados oficiais em tempo real da <a href="https://carrismetropolitana.pt" target="_blank">Carris Metropolitana</a> & TML (Transportes Metropolitanos de Lisboa).
+  </footer>
+
+  <script src="/leaflet.js"></script>
+  <script src="/engine.js"></script>
+  <script>
+    let map = null;
+    let userMarker = null;
+    let stopMarker = null;
+    let busMarkers = [];
+    let currentCoords = null;
+
+    // Initialize Map
+    function initMap(lat, lon) {
+      if (!map) {
+        map = L.map('map', {
+          zoomControl: true,
+          attributionControl: false
+        }).setView([lat, lon], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        setTimeout(() => { if (map) map.invalidateSize(); }, 300);
+      }
+    }
+
+    function updateMapMarkers(userLat, userLon, bestOption, nearbyVehicles) {
+      if (!map) initMap(userLat, userLon);
+
+      // Clear bus markers
+      busMarkers.forEach(m => map.removeLayer(m));
+      busMarkers = [];
+
+      // User Marker
+      if (userMarker) map.removeLayer(userMarker);
+      const userIcon = L.divIcon({
+        className: 'user-pin',
+        html: '<div style="background:#3B82F6; width:16px; height:16px; border:3px solid white; border-radius:50%; box-shadow:0 0 10px rgba(59,130,246,0.8);"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      });
+      userMarker = L.marker([userLat, userLon], { icon: userIcon }).addTo(map)
+        .bindPopup('<b>Você está aqui</b>');
+
+      const bounds = [[userLat, userLon]];
+
+      // Best Stop Marker
+      if (bestOption) {
+        if (stopMarker) map.removeLayer(stopMarker);
+        const stopIcon = L.divIcon({
+          className: 'stop-pin',
+          html: `<div style="background:#FDB71A; color:#000; font-weight:800; font-size:11px; padding:3px 7px; border-radius:6px; border:2px solid #000; white-space:nowrap; box-shadow:0 4px 8px rgba(0,0,0,0.5);">${bestOption.line}</div>`,
+          iconSize: [36, 20],
+          iconAnchor: [18, 10]
+        });
+        stopMarker = L.marker([bestOption.stopLat, bestOption.stopLon], { icon: stopIcon }).addTo(map)
+          .bindPopup(`<b>${bestOption.stopName}</b><br>Linha ${bestOption.line} para ${bestOption.headsign}<br>Partida às ${bestOption.departureTime}`);
+
+        bounds.push([bestOption.stopLat, bestOption.stopLon]);
+      }
+
+      // Live Vehicles
+      if (nearbyVehicles && nearbyVehicles.length > 0) {
+        nearbyVehicles.forEach(v => {
+          const busIcon = L.divIcon({
+            className: 'bus-pin',
+            html: `<div style="background:#10B981; color:#000; font-weight:800; font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid #fff;">🚍 ${v.line}</div>`,
+            iconSize: [40, 18],
+            iconAnchor: [20, 9]
+          });
+          const m = L.marker([v.lat, v.lon], { icon: busIcon }).addTo(map)
+            .bindPopup(`<b>Autocarro Linha ${v.line}</b><br>Velocidade: ${v.speed || 0} km/h`);
+          busMarkers.push(m);
+          bounds.push([v.lat, v.lon]);
+        });
+      }
+
+      if (bounds.length > 1) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 16 });
+      } else {
+        map.setView([userLat, userLon], 14);
+      }
+      setTimeout(() => { if (map) map.invalidateSize(); }, 200);
+    }
+
+    async function fetchRecommendation(lat, lon) {
+      try {
+        let data = null;
+        try {
+          const res = await fetch(`/api/recommendation?lat=${lat}&lon=${lon}`);
+          if (res.ok) data = await res.json();
+        } catch (serverErr) {
+          console.log('Servidor local não encontrado, usando motor nativo do APK...');
+        }
+
+        // Autonomous Client-side Engine Fallback for Standalone APK!
+        if (!data || data.error) {
+          data = await getClientSideRecommendation(lat, lon);
+        }
+
+        renderResults(data, lat, lon);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('contentArea').innerHTML = `
+          <div style="background:#2D1515; border:1px solid #7F1D1D; padding:20px; border-radius:12px; color:#FCA5A5;">
+            <b>Erro ao carregar dados:</b> ${err.message}. Tente atualizar a página.
+          </div>
+        `;
+      }
+    }
+
+    function renderResults(data, userLat, userLon) {
+      document.getElementById('currentLocName').textContent = data.region.regionName;
+      document.getElementById('destLocName').textContent = data.region.destinationName;
+      document.getElementById('mapStatus').textContent = `Atualizado às ${data.currentTime}`;
+
+      const best = data.bestOption;
+      const content = document.getElementById('contentArea');
+
+      if (!best) {
+        content.innerHTML = `
+          <div class="hero-card" style="border-color: #4B5563;">
+            <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Nenhum autocarro encontrado nas próximas horas</div>
+            <p style="color: var(--cm-text-muted); font-size: 14px;">Não há partidas programadas no momento para as linhas rápidas entre Lisboa e Montijo.</p>
+          </div>
+        `;
+        document.getElementById('alternativesSection').style.display = 'none';
+        return;
+      }
+
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${best.stopLat},${best.stopLon}&travelmode=walking`;
+
+      content.innerHTML = `
+        <div class="hero-card">
+          <div class="hero-header">
+            <div class="line-badge">${best.line}</div>
+            <div>
+              <div class="hero-dest">${best.headsign}</div>
+              <div class="hero-subtitle">Paragem recomendada: <b>${best.stopName}</b></div>
+            </div>
+          </div>
+
+          <div class="hero-grid">
+            <div class="stat-box">
+              <div class="stat-label">Partida Prevista</div>
+              <div class="stat-val highlight">${best.departureTime}</div>
+              <div class="stat-sub">Daqui a ${best.minutesUntilDeparture} min</div>
+            </div>
+
+            <div class="stat-box">
+              <div class="stat-label">Caminhada</div>
+              <div class="stat-val">${best.walkMinutes} <span style="font-size:14px;">min</span></div>
+              <div class="stat-sub">${best.walkDistanceKm} km a pé</div>
+            </div>
+
+            <div class="stat-box">
+              <div class="stat-label">Tempo até Apanhar</div>
+              <div class="stat-val">${best.totalMinutesToBus} <span style="font-size:14px;">min</span></div>
+              <div class="stat-sub">${best.canCatch ? '✅ Tempo suficiente' : '⚠️ Saia já!'}</div>
+            </div>
+
+            <div class="stat-box">
+              <div class="stat-label">Autocarro no Mapa</div>
+              <div class="stat-val" style="font-size:18px;">${best.nearbyLiveVehicle ? '🟢 Em trânsito' : '⚪ Programado'}</div>
+              <div class="stat-sub">${best.nearbyLiveVehicle ? (best.nearbyLiveVehicle.speed + ' km/h') : 'Sinal GPS aguardado'}</div>
+            </div>
+          </div>
+
+          <div class="walking-info">
+            <div class="walking-text">
+              <span class="walking-icon">🚶</span>
+              <span>Caminhe até <b>${best.stopName}</b> (${best.walkDistanceKm} km, ~${best.walkMinutes} min a pé).</span>
+            </div>
+            <a href="${mapsUrl}" target="_blank" class="btn-maps">
+              Ver a pé no Maps ➜
+            </a>
+          </div>
+        </div>
+      `;
+
+      // Render Alternatives
+      const altSection = document.getElementById('alternativesSection');
+      const stopsList = document.getElementById('stopsList');
+      stopsList.innerHTML = '';
+
+      if (data.nearestStops && data.nearestStops.length > 0) {
+        altSection.style.display = 'block';
+
+        data.nearestStops.forEach(stop => {
+          const card = document.createElement('div');
+          card.className = 'stop-card';
+
+          let depsRows = '';
+          if (stop.nextDepartures.length === 0) {
+            depsRows = '<tr><td colspan="3" style="color:var(--cm-text-muted); font-size:12px;">Sem partidas próximas</td></tr>';
+          } else {
+            stop.nextDepartures.forEach(d => {
+              depsRows += `
+                <tr>
+                  <td><span class="line-tag">${d.line}</span> ${d.headsign}</td>
+                  <td class="time-tag">${d.scheduledTime}</td>
+                  <td class="min-tag">em ${d.minutesUntil} min</td>
+                </tr>
+              `;
+            });
+          }
+
+          card.innerHTML = `
+            <div class="stop-top">
+              <div class="stop-title">📍 ${stop.stopName}</div>
+              <div class="stop-dist">${stop.distanceKm} km (${stop.walkMinutes} min a pé)</div>
+            </div>
+            <table class="departures-table">
+              <thead>
+                <tr>
+                  <th>Linha / Destino</th>
+                  <th>Horário</th>
+                  <th>Faltam</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${depsRows}
+              </tbody>
+            </table>
+          `;
+          stopsList.appendChild(card);
+        });
+      }
+
+      // Collect vehicles
+      const vehicles = [];
+      data.nearestStops.forEach(s => {
+        if (s.nearbyVehicles) vehicles.push(...s.nearbyVehicles);
+      });
+
+      updateMapMarkers(userLat, userLon, best, vehicles);
+    }
+
+    function showNotification(msg, isError = false) {
+      let toast = document.getElementById('geoToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'geoToast';
+        toast.style.cssText = 'position:fixed; bottom:20px; right:20px; z-index:9999; padding:12px 18px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,0.5); transition:all 0.3s;';
+        document.body.appendChild(toast);
+      }
+      toast.style.background = isError ? '#EF4444' : '#10B981';
+      toast.style.color = '#fff';
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    function getUserLocation() {
+      const btn = document.querySelector('.btn-refresh');
+      if (btn) btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></div> A obter GPS...';
+
+      if (!('geolocation' in navigator)) {
+        showNotification('Geolocalização não é suportada neste navegador.', true);
+        if (btn) btn.innerHTML = '🔄 Atualizar GPS';
+        forceSimulate('lisbon');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          if (btn) btn.innerHTML = '🔄 Atualizar GPS';
+          currentCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          showNotification('Localização GPS obtida com sucesso!');
+          fetchRecommendation(currentCoords.lat, currentCoords.lon);
+        },
+        err => {
+          if (btn) btn.innerHTML = '🔄 Atualizar GPS';
+          console.warn('Erro de GPS:', err);
+          let errMsg = 'Não foi possível obter o GPS.';
+          if (err.code === 1) {
+            errMsg = 'Permissão de GPS negada. Ative a localização no navegador/cadeado do site.';
+          } else if (err.code === 2) {
+            errMsg = 'Posição GPS indisponível.';
+          } else if (err.code === 3) {
+            errMsg = 'Tempo limite de GPS esgotado. A tentar novamente com precisão padrão...';
+            // Retry with low accuracy
+            navigator.geolocation.getCurrentPosition(
+              pos2 => {
+                currentCoords = { lat: pos2.coords.latitude, lon: pos2.coords.longitude };
+                showNotification('Localização aproximada obtida!');
+                fetchRecommendation(currentCoords.lat, currentCoords.lon);
+              },
+              err2 => {
+                showNotification('Não foi possível obter localização. A usar ponto de simulação.', true);
+                forceSimulate('lisbon');
+              },
+              { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+            );
+            return;
+          }
+          showNotification(errMsg, true);
+          if (!currentCoords) forceSimulate('lisbon');
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+      );
+    }
+
+    function forceSimulate(place) {
+      if (place === 'lisbon') {
+        // Gare do Oriente
+        currentCoords = { lat: 38.7679, lon: -9.0991 };
+      } else {
+        // Montijo Terminal Rodoviário
+        currentCoords = { lat: 38.7065, lon: -8.9737 };
+      }
+      fetchRecommendation(currentCoords.lat, currentCoords.lon);
+    }
+
+    // PWA Service Worker Registration & Install Prompt
+    let deferredPrompt = null;
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW erro:', err));
+      });
+    }
+
+    // Always show install button on mobile or when prompt is available
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('btnInstallApp');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    // If standalone already, hide button
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      const installBtn = document.getElementById('btnInstallApp');
+      if (installBtn) installBtn.style.display = 'none';
+    } else {
+      // Show install button so user can always click it
+      const installBtn = document.getElementById('btnInstallApp');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    }
+
+    async function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          const installBtn = document.getElementById('btnInstallApp');
+          if (installBtn) installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+      } else {
+        alert("Para instalar no telemóvel:\n1. Toque nos 3 pontinhos do Chrome (canto superior direito).\n2. Selecione 'Instalar aplicação' ou 'Adicionar ao ecrã principal'.");
+      }
+    }
+
+    // Auto-load on open
+    window.addEventListener('DOMContentLoaded', () => {
+      getUserLocation();
+    });
+
+    // Auto refresh every 30 seconds
+    setInterval(() => {
+      if (currentCoords) {
+        fetchRecommendation(currentCoords.lat, currentCoords.lon);
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
