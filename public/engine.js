@@ -187,7 +187,7 @@ async function getClientSideRecommendation(lat, lon) {
       lon: stop.lon,
       distanceKm: stop.distanceKm,
       walkMinutes: stop.walkTimeMin,
-      lines: stop.lines || [sp.line_id],
+      lines: stop.lines || stop.line_ids || [],
       nextDepartures: upcomingTrips.slice(0, 4),
       nearbyVehicles: relevantVehicles.slice(0, 2)
     };
