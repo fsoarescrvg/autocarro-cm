@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Carris Metropolitana | Lisboa ⇄ Montijo Rápido</title>
+  <title>CM Rápido | Transporte Mais Rápido</title>
   
   <!-- PWA & Mobile Meta Tags -->
   <link rel="manifest" href="/manifest.json">
@@ -54,11 +54,11 @@
 
     /* Header */
     header {
-      background: rgba(18, 21, 27, 0.85);
+      background: rgba(18, 21, 27, 0.9);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--cm-border);
-      padding: 14px 20px;
+      padding: 12px 18px;
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -70,7 +70,7 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .brand-badge {
@@ -84,7 +84,7 @@
     }
 
     .brand-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: -0.3px;
     }
@@ -93,18 +93,18 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--cm-green);
       background: rgba(16, 185, 129, 0.12);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 9999px;
       border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
     .pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       background: var(--cm-green);
       border-radius: 50%;
       animation: pulse 1.8s infinite;
@@ -122,30 +122,30 @@
       max-width: 900px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 16px 14px 40px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
-    /* Location Status Bar */
+    /* Navigation & Target Control */
     .status-panel {
       background: var(--cm-card);
       border: 1px solid var(--cm-border);
       border-radius: 16px;
-      padding: 18px 20px;
+      padding: 16px;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      flex-direction: column;
+      gap: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
     .route-context {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .direction-pill {
@@ -154,9 +154,9 @@
       gap: 8px;
       background: var(--cm-card-subtle);
       border: 1px solid var(--cm-border);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
     }
 
@@ -165,18 +165,53 @@
       font-weight: 800;
     }
 
-    .quick-switch {
+    .dest-toggles {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .btn-sm {
+    .dest-btn {
       background: var(--cm-card-subtle);
       border: 1px solid var(--cm-border);
       color: var(--cm-text-muted);
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dest-btn.active {
+      background: var(--cm-yellow);
+      color: #000;
+      border-color: var(--cm-yellow);
+    }
+
+    .quick-origins {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .origin-label {
+      font-size: 11px;
+      color: var(--cm-text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .btn-sm {
+      background: var(--cm-card-subtle);
+      border: 1px solid var(--cm-border);
+      color: var(--cm-text-muted);
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -192,147 +227,179 @@
       color: #000;
       border: none;
       font-weight: 700;
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 10px;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 13px;
-      transition: background 0.15s, transform 0.1s;
+      font-size: 12px;
+      margin-left: auto;
     }
 
-    .btn-refresh:active {
-      transform: scale(0.97);
+    /* Dual Cards: Mais Rápido & Próxima Saída */
+    .dual-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
 
-    /* Hero Recommendation Card */
-    .hero-card {
+    @media (max-width: 720px) {
+      .dual-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .route-card {
       background: linear-gradient(145deg, #222834 0%, #171b22 100%);
       border: 2px solid var(--cm-yellow);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(253, 183, 26, 0.15);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(253, 183, 26, 0.12);
       position: relative;
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .hero-card::after {
-      content: 'OPÇÃO MAIS RÁPIDA';
+    .route-card.soonest {
+      border-color: var(--cm-blue);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+    }
+
+    .card-badge {
       position: absolute;
-      top: 16px;
-      right: 18px;
-      background: var(--cm-yellow);
-      color: #000;
-      font-size: 11px;
+      top: 14px;
+      right: 16px;
+      font-size: 10px;
       font-weight: 800;
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
       letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    .hero-header {
+    .card-badge.gold {
+      background: var(--cm-yellow);
+      color: #000;
+    }
+
+    .card-badge.blue {
+      background: var(--cm-blue);
+      color: #fff;
+    }
+
+    .card-header {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
     .line-badge {
       background: var(--cm-yellow);
       color: #000;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
-      padding: 6px 16px;
-      border-radius: 12px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
       letter-spacing: -0.5px;
-      box-shadow: 0 4px 12px rgba(253, 183, 26, 0.3);
     }
 
-    .hero-dest {
-      font-size: 18px;
+    .card-title {
+      font-size: 16px;
       font-weight: 700;
       color: #fff;
+      line-height: 1.2;
     }
 
-    .hero-subtitle {
-      font-size: 13px;
+    .card-subtitle {
+      font-size: 12px;
       color: var(--cm-text-muted);
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
-    .hero-grid {
+    .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .stat-box {
+    .metric-box {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 10px;
+      padding: 10px 12px;
     }
 
-    .stat-label {
-      font-size: 11px;
+    .metric-label {
+      font-size: 10px;
       text-transform: uppercase;
       font-weight: 600;
       color: var(--cm-text-muted);
       letter-spacing: 0.5px;
     }
 
-    .stat-val {
-      font-size: 22px;
+    .metric-val {
+      font-size: 20px;
       font-weight: 800;
       color: #fff;
       font-family: var(--font-mono);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
-    .stat-val.highlight {
+    .metric-val.highlight {
       color: var(--cm-yellow);
     }
 
-    .stat-sub {
-      font-size: 11px;
+    .metric-sub {
+      font-size: 10px;
       color: var(--cm-text-muted);
       margin-top: 2px;
     }
 
-    .walking-info {
+    .itinerary-box {
       background: var(--cm-card-subtle);
-      border-radius: 12px;
-      padding: 14px 16px;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 13px;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .walking-text {
+    .itinerary-step {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 8px;
     }
 
-    .walking-icon {
-      font-size: 20px;
+    .step-icon {
+      font-size: 14px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .step-text {
+      flex: 1;
+      line-height: 1.3;
     }
 
     .btn-maps {
+      margin-top: 10px;
       background: transparent;
       color: var(--cm-yellow);
       border: 1px solid var(--cm-yellow);
       padding: 6px 12px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
       transition: all 0.2s;
     }
@@ -346,13 +413,13 @@
     .map-card {
       background: var(--cm-card);
       border: 1px solid var(--cm-border);
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
     .map-header {
-      padding: 14px 18px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -360,89 +427,56 @@
     }
 
     .map-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     #map {
-      height: 320px;
+      height: 280px;
       width: 100%;
       background: #151820;
     }
 
-    /* Nearest Stops List */
+    /* Alternatives List */
     .section-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: -0.3px;
-      margin-top: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-top: 6px;
     }
 
-    .stops-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .stop-card {
-      background: var(--cm-card);
-      border: 1px solid var(--cm-border);
-      border-radius: 14px;
-      padding: 16px;
-      transition: transform 0.15s, border-color 0.15s;
-    }
-
-    .stop-card:hover {
-      border-color: #3f475c;
-    }
-
-    .stop-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .stop-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .stop-dist {
-      font-size: 12px;
-      color: var(--cm-text-muted);
-      white-space: nowrap;
-    }
-
-    .departures-table {
+    .options-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      background: var(--cm-card);
+      border: 1px solid var(--cm-border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 12px;
     }
 
-    .departures-table th {
+    .options-table th {
       text-align: left;
+      padding: 10px 14px;
+      background: var(--cm-card-subtle);
       color: var(--cm-text-muted);
       font-size: 11px;
-      font-weight: 600;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-weight: 700;
+      border-bottom: 1px solid var(--cm-border);
     }
 
-    .departures-table td {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
+    .options-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
 
-    .departures-table tr:last-child td {
+    .options-table tr:last-child td {
       border-bottom: none;
     }
 
@@ -457,62 +491,66 @@
       display: inline-block;
     }
 
-    .time-tag {
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: #fff;
+    /* Home address modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .min-tag {
-      font-weight: 700;
-      color: var(--cm-green);
+    .modal-card {
+      background: var(--cm-card);
+      border: 1px solid var(--cm-border);
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 440px;
+      width: 100%;
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--cm-dark);
+      border: 1px solid var(--cm-border);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin: 12px 0;
     }
 
     /* Skeleton Loading State */
     .loading-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 50px 20px;
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid var(--cm-card-subtle);
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--cm-card-subtle);
       border-top-color: var(--cm-yellow);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
+      margin: 0 auto 14px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
-    /* Footer */
     footer {
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--cm-text-muted);
-      padding: 20px;
+      padding: 18px;
       border-top: 1px solid var(--cm-border);
       background: var(--cm-dark);
-    }
-
-    footer a {
-      color: var(--cm-yellow);
-      text-decoration: none;
-    }
-
-    @media (max-width: 600px) {
-      .hero-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .brand-title {
-        font-size: 14px;
-      }
-      .status-panel {
-        padding: 14px;
-      }
     }
   </style>
 </head>
@@ -521,39 +559,43 @@
   <header>
     <div class="brand">
       <div class="brand-badge">CM</div>
-      <div class="brand-title">Lisboa ⇄ Montijo Directo</div>
+      <div class="brand-title">Lisboa ⇄ Casa (Montijo)</div>
     </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-      <button id="btnInstallApp" onclick="installPWA()" style="display: none; background: var(--cm-yellow); color: #000; border: none; font-weight: 800; font-size: 12px; padding: 6px 12px; border-radius: 8px; cursor: pointer; align-items: center; gap: 6px;">
-        📲 Instalar App
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn-sm" onclick="openHomeModal()" title="Configurar Casa" style="display:inline-flex; align-items:center; gap:4px;">
+        🏠 Definir Casa
       </button>
       <div class="live-indicator">
         <div class="pulse-dot"></div>
-        <span id="liveStatusText">API Carris Metropolitana</span>
+        <span>GPS Tempo Real</span>
       </div>
     </div>
   </header>
 
   <main>
-    <!-- Status & Location Switcher -->
+    <!-- Route Control & Origin Switcher -->
     <div class="status-panel">
-      <div>
-        <div style="font-size: 12px; color: var(--cm-text-muted); margin-bottom: 4px;">Localização Detetada:</div>
-        <div class="route-context">
-          <div class="direction-pill" id="routeDirectionPill">
-            <span id="currentLocName">A localizar...</span>
-            <span class="arrow">➜</span>
-            <span id="destLocName">Aguardando GPS</span>
-          </div>
+      <div class="route-context">
+        <div class="direction-pill">
+          <span id="currentLocName">A localizar GPS...</span>
+          <span class="arrow">➜</span>
+          <span id="destLocName">Casa</span>
+        </div>
+
+        <div class="dest-toggles">
+          <button class="dest-btn active" id="btnDestHome" onclick="setDestinationTarget('home')">🏠 Para Casa</button>
+          <button class="dest-btn" id="btnDestLisbon" onclick="setDestinationTarget('lisboa')">🏢 Para Lisboa (Oriente)</button>
         </div>
       </div>
 
-      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-        <button class="btn-sm" onclick="forceSimulate('lisbon')">Simular Lisboa (Oriente)</button>
-        <button class="btn-sm" onclick="forceSimulate('montijo')">Simular Montijo</button>
+      <div class="quick-origins">
+        <span class="origin-label">Simular Origem:</span>
+        <button class="btn-sm" onclick="simulateOrigin(38.7679, -9.0991, 'Lisboa (Oriente)')">Lisboa (Oriente)</button>
+        <button class="btn-sm" onclick="simulateOrigin(38.7561, -8.9612, 'Alcochete (Escola)')">Alcochete</button>
+        <button class="btn-sm" onclick="simulateOrigin(38.7065, -8.9737, 'Montijo (Centro)')">Montijo</button>
+        <button class="btn-sm" onclick="simulateOrigin(38.6417, -9.1027, 'Seixal')">Seixal</button>
         <button class="btn-refresh" onclick="getUserLocation()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-          Atualizar GPS
+          🔄 Atualizar GPS
         </button>
       </div>
     </div>
@@ -562,8 +604,7 @@
     <div id="contentArea">
       <div class="loading-state">
         <div class="spinner"></div>
-        <p style="font-size: 15px; font-weight: 600;">Obtendo sua localização e horários em tempo real...</p>
-        <p style="font-size: 13px; color: var(--cm-text-muted); margin-top: 6px;">Por favor, permita o acesso à localização no navegador.</p>
+        <p style="font-size: 14px; font-weight: 600;">A calcular os transportes mais rápidos...</p>
       </div>
     </div>
 
@@ -571,26 +612,55 @@
     <div class="map-card">
       <div class="map-header">
         <div class="map-title">
-          <span>📍</span> Mapa da Paragem & Trajeto
+          <span>📍</span> Mapa da Paragem, Autocarros e Trajeto
         </div>
-        <div style="font-size: 12px; color: var(--cm-text-muted);" id="mapStatus">
-          A carregar mapa...
+        <div style="font-size: 11px; color: var(--cm-text-muted);" id="mapStatus">
+          Aguardando GPS...
         </div>
       </div>
       <div id="map"></div>
     </div>
 
-    <!-- Alternatives list -->
+    <!-- Alternatives List -->
     <div id="alternativesSection" style="display: none;">
       <h3 class="section-title">
-        <span>🕒</span> Outras Paragens e Horários Próximos
+        <span>🕒</span> Todas as Opções e Partidas Seguintes
       </h3>
-      <div class="stops-list" id="stopsList"></div>
+      <table class="options-table">
+        <thead>
+          <tr>
+            <th>Linha / Destino</th>
+            <th>Paragem de Embarque</th>
+            <th>Partida</th>
+            <th>Duração Total</th>
+          </tr>
+        </thead>
+        <tbody id="optionsTableBody"></tbody>
+      </table>
     </div>
   </main>
 
+  <!-- Modal for Home Address Configuration -->
+  <div class="modal-overlay" id="homeModal">
+    <div class="modal-card">
+      <h3 style="font-size:16px; margin-bottom:8px;">🏠 Configurar Local de Residência</h3>
+      <p style="font-size:12px; color:var(--cm-text-muted);">
+        Por padrão, está configurado na <b>Rua Rui de Pina / Esteval (Montijo)</b>.
+      </p>
+      <input type="text" class="input-field" id="inputHomeName" value="Casa (Rua Rui de Pina, Montijo)" placeholder="Nome do local">
+      <div style="display:flex; gap:8px;">
+        <input type="number" step="any" class="input-field" id="inputHomeLat" value="38.7020955" placeholder="Latitude">
+        <input type="number" step="any" class="input-field" id="inputHomeLon" value="-8.9594818" placeholder="Longitude">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+        <button class="btn-sm" onclick="closeHomeModal()">Cancelar</button>
+        <button class="btn-refresh" onclick="saveNewHome()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
-    Dados oficiais em tempo real da <a href="https://carrismetropolitana.pt" target="_blank">Carris Metropolitana</a> & TML (Transportes Metropolitanos de Lisboa).
+    Dados oficiais em tempo real da <a href="https://carrismetropolitana.pt" target="_blank" style="color:var(--cm-yellow); text-decoration:none;">Carris Metropolitana</a> & TML.
   </footer>
 
   <script src="/leaflet.js"></script>
@@ -601,8 +671,8 @@
     let stopMarker = null;
     let busMarkers = [];
     let currentCoords = null;
+    let currentTarget = 'auto';
 
-    // Initialize Map
     function initMap(lat, lon) {
       if (!map) {
         map = L.map('map', {
@@ -619,14 +689,12 @@
       }
     }
 
-    function updateMapMarkers(userLat, userLon, bestOption, nearbyVehicles) {
+    function updateMapMarkers(userLat, userLon, fastestOption, nearbyVehicles) {
       if (!map) initMap(userLat, userLon);
 
-      // Clear bus markers
       busMarkers.forEach(m => map.removeLayer(m));
       busMarkers = [];
 
-      // User Marker
       if (userMarker) map.removeLayer(userMarker);
       const userIcon = L.divIcon({
         className: 'user-pin',
@@ -639,22 +707,20 @@
 
       const bounds = [[userLat, userLon]];
 
-      // Best Stop Marker
-      if (bestOption) {
+      if (fastestOption && fastestOption.originStop) {
         if (stopMarker) map.removeLayer(stopMarker);
         const stopIcon = L.divIcon({
           className: 'stop-pin',
-          html: `<div style="background:#FDB71A; color:#000; font-weight:800; font-size:11px; padding:3px 7px; border-radius:6px; border:2px solid #000; white-space:nowrap; box-shadow:0 4px 8px rgba(0,0,0,0.5);">${bestOption.line}</div>`,
+          html: `<div style="background:#FDB71A; color:#000; font-weight:800; font-size:11px; padding:3px 7px; border-radius:6px; border:2px solid #000; white-space:nowrap; box-shadow:0 4px 8px rgba(0,0,0,0.5);">${fastestOption.line}</div>`,
           iconSize: [36, 20],
           iconAnchor: [18, 10]
         });
-        stopMarker = L.marker([bestOption.stopLat, bestOption.stopLon], { icon: stopIcon }).addTo(map)
-          .bindPopup(`<b>${bestOption.stopName}</b><br>Linha ${bestOption.line} para ${bestOption.headsign}<br>Partida às ${bestOption.departureTime}`);
+        stopMarker = L.marker([fastestOption.originStop.lat, fastestOption.originStop.lon], { icon: stopIcon }).addTo(map)
+          .bindPopup(`<b>Embarque: ${fastestOption.originStop.long_name}</b><br>Linha ${fastestOption.line} para ${fastestOption.headsign}<br>Partida: ${fastestOption.departureTime}`);
 
-        bounds.push([bestOption.stopLat, bestOption.stopLon]);
+        bounds.push([fastestOption.originStop.lat, fastestOption.originStop.lon]);
       }
 
-      // Live Vehicles
       if (nearbyVehicles && nearbyVehicles.length > 0) {
         nearbyVehicles.forEach(v => {
           const busIcon = L.divIcon({
@@ -678,182 +744,152 @@
       setTimeout(() => { if (map) map.invalidateSize(); }, 200);
     }
 
-    async function fetchRecommendation(lat, lon) {
+    async function runRouting(lat, lon) {
       try {
-        let data = null;
-        try {
-          const res = await fetch(`/api/recommendation?lat=${lat}&lon=${lon}`);
-          if (res.ok) data = await res.json();
-        } catch (serverErr) {
-          console.log('Servidor local não encontrado, usando motor nativo do APK...');
-        }
-
-        // Autonomous Client-side Engine Fallback for Standalone APK!
-        if (!data || data.error) {
-          data = await getClientSideRecommendation(lat, lon);
-        }
-
+        const data = await getSmartRecommendation(lat, lon, currentTarget);
         renderResults(data, lat, lon);
       } catch (err) {
         console.error(err);
         document.getElementById('contentArea').innerHTML = `
           <div style="background:#2D1515; border:1px solid #7F1D1D; padding:20px; border-radius:12px; color:#FCA5A5;">
-            <b>Erro ao carregar dados:</b> ${err.message}. Tente atualizar a página.
+            <b>Erro ao carregar dados:</b> ${err.message}.
           </div>
         `;
       }
     }
 
     function renderResults(data, userLat, userLon) {
-      document.getElementById('currentLocName').textContent = data.region.regionName;
-      document.getElementById('destLocName').textContent = data.region.destinationName;
+      document.getElementById('destLocName').textContent = data.destination.name;
       document.getElementById('mapStatus').textContent = `Atualizado às ${data.currentTime}`;
 
-      const best = data.bestOption;
-      const content = document.getElementById('contentArea');
+      // Update active toggle buttons
+      document.getElementById('btnDestHome').className = data.targetMode === 'home' ? 'dest-btn active' : 'dest-btn';
+      document.getElementById('btnDestLisbon').className = data.targetMode === 'lisboa' ? 'dest-btn active' : 'dest-btn';
 
-      if (!best) {
+      const content = document.getElementById('contentArea');
+      const fastest = data.fastestOption;
+      const soonest = data.nextDepartureSoonest;
+
+      if (!fastest && !soonest) {
         content.innerHTML = `
-          <div class="hero-card" style="border-color: #4B5563;">
-            <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Nenhum autocarro encontrado nas próximas horas</div>
-            <p style="color: var(--cm-text-muted); font-size: 14px;">Não há partidas programadas no momento para as linhas rápidas entre Lisboa e Montijo.</p>
+          <div class="route-card" style="border-color: #4B5563;">
+            <div style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">Nenhum autocarro direto encontrado para este destino no momento</div>
+            <p style="color: var(--cm-text-muted); font-size: 13px;">Não há serviços diretos ativos da sua localização atual para ${data.destination.name} nas próximas horas.</p>
           </div>
         `;
         document.getElementById('alternativesSection').style.display = 'none';
         return;
       }
 
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${best.stopLat},${best.stopLon}&travelmode=walking`;
+      function buildCardHTML(opt, title, badgeText, badgeClass) {
+        if (!opt) return '';
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${opt.originStop.lat},${opt.originStop.lon}&travelmode=walking`;
 
-      content.innerHTML = `
-        <div class="hero-card">
-          <div class="hero-header">
-            <div class="line-badge">${best.line}</div>
-            <div>
-              <div class="hero-dest">${best.headsign}</div>
-              <div class="hero-subtitle">Paragem recomendada: <b>${best.stopName}</b></div>
-            </div>
-          </div>
-
-          <div class="hero-grid">
-            <div class="stat-box">
-              <div class="stat-label">Partida Prevista</div>
-              <div class="stat-val highlight">${best.departureTime}</div>
-              <div class="stat-sub">Daqui a ${best.minutesUntilDeparture} min</div>
+        return `
+          <div class="route-card ${badgeClass === 'blue' ? 'soonest' : ''}">
+            <div class="card-badge ${badgeClass}">${badgeText}</div>
+            <div class="card-header">
+              <div class="line-badge">${opt.line}</div>
+              <div>
+                <div class="card-title">${opt.headsign}</div>
+                <div class="card-subtitle">Embarque: <b>${opt.originStop.long_name}</b></div>
+              </div>
             </div>
 
-            <div class="stat-box">
-              <div class="stat-label">Caminhada</div>
-              <div class="stat-val">${best.walkMinutes} <span style="font-size:14px;">min</span></div>
-              <div class="stat-sub">${best.walkDistanceKm} km a pé</div>
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <div class="metric-label">Partida na Paragem</div>
+                <div class="metric-val highlight">${opt.departureTime}</div>
+                <div class="metric-sub">em ${opt.minutesUntilDeparture} min</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Tempo Total de Viagem</div>
+                <div class="metric-val">${opt.totalTravelTimeMin} <span style="font-size:12px;">min</span></div>
+                <div class="metric-sub">chegada ~${opt.arrivalTime}</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Caminhada até Paragem</div>
+                <div class="metric-val">${opt.originWalkMin} <span style="font-size:12px;">min</span></div>
+                <div class="metric-sub">${opt.originWalkKm} km a pé</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Tempo de Autocarro</div>
+                <div class="metric-val">${opt.rideDurationMin} <span style="font-size:12px;">min</span></div>
+                <div class="metric-sub">${opt.destWalkMin > 0 ? (opt.destWalkMin + ' min a pé até casa') : 'Desce em frente'}</div>
+              </div>
             </div>
 
-            <div class="stat-box">
-              <div class="stat-label">Tempo até Apanhar</div>
-              <div class="stat-val">${best.totalMinutesToBus} <span style="font-size:14px;">min</span></div>
-              <div class="stat-sub">${best.canCatch ? '✅ Tempo suficiente' : '⚠️ Saia já!'}</div>
+            <div class="itinerary-box">
+              <div class="itinerary-step">
+                <span class="step-icon">🚶</span>
+                <span class="step-text">Caminhe ${opt.originWalkKm} km (~${opt.originWalkMin} min) até <b>${opt.originStop.long_name}</b>.</span>
+              </div>
+              <div class="itinerary-step">
+                <span class="step-icon">🚍</span>
+                <span class="step-text">Apanhe a <b>Linha ${opt.line}</b> às <b>${opt.departureTime}</b> e desça em <b>${opt.destStop.long_name}</b>.</span>
+              </div>
+              <div class="itinerary-step">
+                <span class="step-icon">🏠</span>
+                <span class="step-text">Caminhe ${opt.destWalkKm} km (~${opt.destWalkMin} min) até ${data.destination.name}.</span>
+              </div>
             </div>
 
-            <div class="stat-box">
-              <div class="stat-label">Autocarro no Mapa</div>
-              <div class="stat-val" style="font-size:18px;">${best.nearbyLiveVehicle ? '🟢 Em trânsito' : '⚪ Programado'}</div>
-              <div class="stat-sub">${best.nearbyLiveVehicle ? (best.nearbyLiveVehicle.speed + ' km/h') : 'Sinal GPS aguardado'}</div>
-            </div>
-          </div>
-
-          <div class="walking-info">
-            <div class="walking-text">
-              <span class="walking-icon">🚶</span>
-              <span>Caminhe até <b>${best.stopName}</b> (${best.walkDistanceKm} km, ~${best.walkMinutes} min a pé).</span>
-            </div>
             <a href="${mapsUrl}" target="_blank" class="btn-maps">
-              Ver a pé no Maps ➜
+              🧭 Abrir Caminhada até à Paragem no Maps ➜
             </a>
           </div>
+        `;
+      }
+
+      content.innerHTML = `
+        <div class="dual-cards-grid">
+          ${buildCardHTML(fastest, 'Transporte Mais Rápido', '⚡ MAIS RÁPIDO PARA O DESTINO', 'gold')}
+          ${soonest && (soonest.line !== fastest.line || soonest.departureTime !== fastest.departureTime) 
+            ? buildCardHTML(soonest, 'Próxima Partida Imediata', '⏱️ PRÓXIMO A SAIR', 'blue') 
+            : ''}
         </div>
       `;
 
-      // Render Alternatives
+      // Render Alternatives Table
       const altSection = document.getElementById('alternativesSection');
-      const stopsList = document.getElementById('stopsList');
-      stopsList.innerHTML = '';
+      const tableBody = document.getElementById('optionsTableBody');
+      tableBody.innerHTML = '';
 
-      if (data.nearestStops && data.nearestStops.length > 0) {
+      if (data.allOptions && data.allOptions.length > 0) {
         altSection.style.display = 'block';
-
-        data.nearestStops.forEach(stop => {
-          const card = document.createElement('div');
-          card.className = 'stop-card';
-
-          let depsRows = '';
-          if (stop.nextDepartures.length === 0) {
-            depsRows = '<tr><td colspan="3" style="color:var(--cm-text-muted); font-size:12px;">Sem partidas próximas</td></tr>';
-          } else {
-            stop.nextDepartures.forEach(d => {
-              depsRows += `
-                <tr>
-                  <td><span class="line-tag">${d.line}</span> ${d.headsign}</td>
-                  <td class="time-tag">${d.scheduledTime}</td>
-                  <td class="min-tag">em ${d.minutesUntil} min</td>
-                </tr>
-              `;
-            });
-          }
-
-          card.innerHTML = `
-            <div class="stop-top">
-              <div class="stop-title">📍 ${stop.stopName}</div>
-              <div class="stop-dist">${stop.distanceKm} km (${stop.walkMinutes} min a pé)</div>
-            </div>
-            <table class="departures-table">
-              <thead>
-                <tr>
-                  <th>Linha / Destino</th>
-                  <th>Horário</th>
-                  <th>Faltam</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${depsRows}
-              </tbody>
-            </table>
+        data.allOptions.forEach(opt => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><span class="line-tag">${opt.line}</span> <b>${opt.headsign}</b></td>
+            <td>${opt.originStop.long_name} (${opt.originWalkMin} min a pé)</td>
+            <td style="font-family:var(--font-mono); font-weight:700;">${opt.departureTime} <span style="font-size:10px; color:var(--cm-green);">(em ${opt.minutesUntilDeparture}m)</span></td>
+            <td style="font-family:var(--font-mono); font-weight:700;">${opt.totalTravelTimeMin} min total</td>
           `;
-          stopsList.appendChild(card);
+          tableBody.appendChild(row);
         });
       }
 
-      // Collect vehicles
-      const vehicles = [];
-      data.nearestStops.forEach(s => {
-        if (s.nearbyVehicles) vehicles.push(...s.nearbyVehicles);
-      });
-
-      updateMapMarkers(userLat, userLon, best, vehicles);
+      updateMapMarkers(userLat, userLon, fastest, data.nearbyVehicles);
     }
 
-    function showNotification(msg, isError = false) {
-      let toast = document.getElementById('geoToast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'geoToast';
-        toast.style.cssText = 'position:fixed; bottom:20px; right:20px; z-index:9999; padding:12px 18px; border-radius:10px; font-size:13px; font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,0.5); transition:all 0.3s;';
-        document.body.appendChild(toast);
-      }
-      toast.style.background = isError ? '#EF4444' : '#10B981';
-      toast.style.color = '#fff';
-      toast.textContent = msg;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    function setDestinationTarget(target) {
+      currentTarget = target;
+      if (currentCoords) runRouting(currentCoords.lat, currentCoords.lon);
+    }
+
+    function simulateOrigin(lat, lon, label) {
+      currentCoords = { lat, lon };
+      document.getElementById('currentLocName').textContent = label;
+      runRouting(lat, lon);
     }
 
     function getUserLocation() {
       const btn = document.querySelector('.btn-refresh');
-      if (btn) btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;margin:0;"></div> A obter GPS...';
+      if (btn) btn.innerHTML = '⌛ GPS...';
 
       if (!('geolocation' in navigator)) {
-        showNotification('Geolocalização não é suportada neste navegador.', true);
         if (btn) btn.innerHTML = '🔄 Atualizar GPS';
-        forceSimulate('lisbon');
+        simulateOrigin(38.7679, -9.0991, 'Lisboa (Oriente)');
         return;
       }
 
@@ -861,102 +897,46 @@
         pos => {
           if (btn) btn.innerHTML = '🔄 Atualizar GPS';
           currentCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          showNotification('Localização GPS obtida com sucesso!');
-          fetchRecommendation(currentCoords.lat, currentCoords.lon);
+          document.getElementById('currentLocName').textContent = 'Localização Atual';
+          runRouting(currentCoords.lat, currentCoords.lon);
         },
         err => {
           if (btn) btn.innerHTML = '🔄 Atualizar GPS';
-          console.warn('Erro de GPS:', err);
-          let errMsg = 'Não foi possível obter o GPS.';
-          if (err.code === 1) {
-            errMsg = 'Permissão de GPS negada. Ative a localização no navegador/cadeado do site.';
-          } else if (err.code === 2) {
-            errMsg = 'Posição GPS indisponível.';
-          } else if (err.code === 3) {
-            errMsg = 'Tempo limite de GPS esgotado. A tentar novamente com precisão padrão...';
-            // Retry with low accuracy
-            navigator.geolocation.getCurrentPosition(
-              pos2 => {
-                currentCoords = { lat: pos2.coords.latitude, lon: pos2.coords.longitude };
-                showNotification('Localização aproximada obtida!');
-                fetchRecommendation(currentCoords.lat, currentCoords.lon);
-              },
-              err2 => {
-                showNotification('Não foi possível obter localização. A usar ponto de simulação.', true);
-                forceSimulate('lisbon');
-              },
-              { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
-            );
-            return;
-          }
-          showNotification(errMsg, true);
-          if (!currentCoords) forceSimulate('lisbon');
+          console.warn('Erro GPS:', err);
+          simulateOrigin(38.7679, -9.0991, 'Lisboa (Oriente)');
         },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
+        { enableHighAccuracy: true, timeout: 8000 }
       );
     }
 
-    function forceSimulate(place) {
-      if (place === 'lisbon') {
-        // Gare do Oriente
-        currentCoords = { lat: 38.7679, lon: -9.0991 };
-      } else {
-        // Montijo Terminal Rodoviário
-        currentCoords = { lat: 38.7065, lon: -8.9737 };
-      }
-      fetchRecommendation(currentCoords.lat, currentCoords.lon);
+    // Modal Home
+    function openHomeModal() {
+      const home = getSavedHome();
+      document.getElementById('inputHomeName').value = home.name;
+      document.getElementById('inputHomeLat').value = home.lat;
+      document.getElementById('inputHomeLon').value = home.lon;
+      document.getElementById('homeModal').style.display = 'flex';
     }
 
-    // PWA Service Worker Registration & Install Prompt
-    let deferredPrompt = null;
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW erro:', err));
-      });
+    function closeHomeModal() {
+      document.getElementById('homeModal').style.display = 'none';
     }
 
-    // Always show install button on mobile or when prompt is available
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById('btnInstallApp');
-      if (installBtn) installBtn.style.display = 'inline-flex';
-    });
-
-    // If standalone already, hide button
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-      const installBtn = document.getElementById('btnInstallApp');
-      if (installBtn) installBtn.style.display = 'none';
-    } else {
-      // Show install button so user can always click it
-      const installBtn = document.getElementById('btnInstallApp');
-      if (installBtn) installBtn.style.display = 'inline-flex';
+    function saveNewHome() {
+      const name = document.getElementById('inputHomeName').value;
+      const lat = parseFloat(document.getElementById('inputHomeLat').value);
+      const lon = parseFloat(document.getElementById('inputHomeLon').value);
+      saveHomeLocation(name, lat, lon);
+      closeHomeModal();
+      if (currentCoords) runRouting(currentCoords.lat, currentCoords.lon);
     }
 
-    async function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          const installBtn = document.getElementById('btnInstallApp');
-          if (installBtn) installBtn.style.display = 'none';
-        }
-        deferredPrompt = null;
-      } else {
-        alert("Para instalar no telemóvel:\n1. Toque nos 3 pontinhos do Chrome (canto superior direito).\n2. Selecione 'Instalar aplicação' ou 'Adicionar ao ecrã principal'.");
-      }
-    }
-
-    // Auto-load on open
     window.addEventListener('DOMContentLoaded', () => {
       getUserLocation();
     });
 
-    // Auto refresh every 30 seconds
     setInterval(() => {
-      if (currentCoords) {
-        fetchRecommendation(currentCoords.lat, currentCoords.lon);
-      }
+      if (currentCoords) runRouting(currentCoords.lat, currentCoords.lon);
     }, 30000);
   </script>
 </body>
